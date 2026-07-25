@@ -1,0 +1,496 @@
+import React from "react";
+import { SimConditions } from "../types";
+import { Sliders, ShieldAlert, CheckCircle2, DollarSign, Sparkles } from "lucide-react";
+
+interface ConditionInputProps {
+  data: SimConditions;
+  onChange: (data: SimConditions) => void;
+}
+
+export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }) => {
+  const handleFieldChange = <K extends keyof SimConditions>(field: K, value: SimConditions[K]) => {
+    onChange({ ...data, [field]: value });
+  };
+
+  const handleBirthYearChange = (newBirthYear: number) => {
+    const newCurrentAge = 2026 - newBirthYear;
+    let newStartAge = data.withdrawalStartAge;
+    if (newStartAge < newCurrentAge) {
+      newStartAge = newCurrentAge;
+    } else if (newStartAge > 80 && newCurrentAge < 80) {
+      newStartAge = 80;
+    }
+    onChange({
+      ...data,
+      birthYear: newBirthYear,
+      withdrawalStartAge: newStartAge,
+    });
+  };
+
+  const handleFormattedAmountChange = (field: 'includeMonthlyAmount' | 'customMonthlyAmount', rawValue: string) => {
+    const cleanValue = parseInt(rawValue.replace(/,/g, "")) || 0;
+    onChange({ ...data, [field]: cleanValue });
+  };
+
+  const formatNumber = (num: number) => {
+    return num.toLocaleString("ko-KR");
+  };
+
+  const currentAge = 2026 - data.birthYear;
+
+  // Options for birth year: 1930 ~ 2020
+  const birthYearOptions = Array.from({ length: 2020 - 1930 + 1 }, (_, i) => 1930 + i);
+
+  // Options for withdrawal start age: current age ~ 80
+  const startAgeOptions: number[] = [];
+  if (currentAge >= 80) {
+    startAgeOptions.push(currentAge);
+  } else {
+    for (let age = currentAge; age <= 80; age++) {
+      startAgeOptions.push(age);
+    }
+  }
+
+  // Options for expected lifespan: 60 ~ 100
+  const lifespanOptions = Array.from({ length: 100 - 60 + 1 }, (_, i) => 60 + i);
+
+  // Options for withdraw end age: 60 ~ 100
+  const endAgeOptions = Array.from({ length: 100 - 60 + 1 }, (_, i) => 60 + i);
+
+  // Options for optimal start age: 50 ~ 90
+  const optimalStartAgeOptions = Array.from({ length: 90 - 50 + 1 }, (_, i) => 50 + i);
+
+  // Options for inflation rate: 0.0% to 10.0% in steps of 0.1%
+  const inflationOptions = Array.from({ length: 101 }, (_, i) => Number((i * 0.1).toFixed(1)));
+
+  // Options for optimal end age depending on start age
+  const currentOptimalStart = data.optimalStartAge || data.withdrawalStartAge || currentAge;
+  const optimalEndAgeOptions = Array.from(
+    { length: Math.max(1, 100 - currentOptimalStart + 1) },
+    (_, i) => currentOptimalStart + i
+  );
+
+  return (
+    <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300">
+      <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-5">
+        <Sliders className="w-6 h-6 text-indigo-600" />
+        <h3 className="text-lg font-extrabold text-indigo-950 font-display">③ 시뮬레이션 조건 설정</h3>
+      </div>
+
+      <div className="space-y-6">
+        {/* ① 출생년도, ② 연금 개시 나이, ③ 예상 수명 설정 3개 세트 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 bg-slate-50/50 border border-slate-100 rounded-2xl p-5">
+          {/* ① 출생년도 */}
+          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
+            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
+              ① 출생년도
+            </span>
+            <select
+              value={data.birthYear}
+              onChange={(e) => handleBirthYearChange(parseInt(e.target.value) || 1970)}
+              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
+              id="select-birth-year"
+            >
+              {birthYearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}년생 (만 {2026 - year}세)
+                </option>
+              ))}
+            </select>
+            <span className="text-[11px] text-indigo-600 font-extrabold mt-3 text-center block">
+              만 나이 기준시점: 2026년 말
+            </span>
+          </div>
+
+          {/* ② 연금 개시 나이 */}
+          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
+            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
+              ② 연금 개시 나이
+            </span>
+            <select
+              value={startAgeOptions.includes(data.withdrawalStartAge) ? data.withdrawalStartAge : currentAge}
+              onChange={(e) => handleFieldChange("withdrawalStartAge", parseInt(e.target.value) || currentAge)}
+              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
+              id="select-withdrawal-start-age"
+            >
+              {startAgeOptions.map((age) => (
+                <option key={age} value={age}>
+                  만 {age}세 {age === currentAge ? "(올해 개시)" : ""}
+                </option>
+              ))}
+            </select>
+            <span className="text-[11px] text-slate-500 font-bold mt-3 text-center block leading-relaxed">
+              은퇴자산 인출 시작 시점 (최대 80세)
+            </span>
+          </div>
+
+          {/* ③ 예상 수명 설정 */}
+          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
+            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
+              ③ 예상 수명 설정
+            </span>
+            <select
+              value={data.expectedLifespan}
+              onChange={(e) => handleFieldChange("expectedLifespan", parseInt(e.target.value) || 90)}
+              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
+              id="select-expected-lifespan"
+            >
+              {lifespanOptions.map((age) => (
+                <option key={age} value={age}>
+                  만 {age}세까지 은퇴 분석
+                </option>
+              ))}
+            </select>
+            <span className="text-[11px] text-slate-400 font-semibold text-center mt-3 block leading-relaxed">
+              최종 시뮬레이션 종료 지점
+            </span>
+          </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* Requirement 5: 물가인상율 및 세율 방식 (예상수명 설정 바로 다음에 위치) */}
+        {/* ========================================================= */}
+        <div className="bg-slate-50/70 border border-slate-100 rounded-2xl p-5 space-y-4">
+          <h4 className="text-xs sm:text-sm font-extrabold text-slate-800">
+            물가상승률 및 은퇴 연금세율 방식
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* 물가상승률 */}
+            <div>
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
+                매년 예상 물가상승률
+              </label>
+              <select
+                value={data.inflationRate}
+                onChange={(e) => handleFieldChange("inflationRate", parseFloat(e.target.value) || 0)}
+                className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs font-mono"
+                id="select-inflation-rate"
+              >
+                {inflationOptions.map((rate) => (
+                  <option key={rate} value={rate}>
+                    {rate}%
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-slate-400 font-semibold mt-1.5 block">
+                매년 생활비 보정 및 연금 수령액 연동에 적용
+              </span>
+            </div>
+
+            {/* 세율 방식 */}
+            <div>
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
+                은퇴 연금세율 방식 선택
+              </label>
+              <div className="space-y-2">
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleFieldChange("taxRateType", "none")}
+                    className={`py-2 px-1 rounded-md text-[11px] sm:text-xs font-black border transition-all cursor-pointer ${
+                      data.taxRateType === "none"
+                        ? "bg-indigo-950 text-white border-indigo-950"
+                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    비과세 (0%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFieldChange("taxRateType", "pension")}
+                    className={`py-2 px-1 rounded-md text-[11px] sm:text-xs font-black border transition-all cursor-pointer ${
+                      data.taxRateType === "pension"
+                        ? "bg-indigo-950 text-white border-indigo-950"
+                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    연금소득세 (5.5%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFieldChange("taxRateType", "income")}
+                    className={`py-2 px-1 rounded-md text-[11px] sm:text-xs font-black border transition-all cursor-pointer ${
+                      data.taxRateType === "income"
+                        ? "bg-indigo-950 text-white border-indigo-950"
+                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    일반소득세 (15.4%)
+                  </button>
+                </div>
+
+                <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={data.taxRateType === "custom" ? data.customTaxRate : ""}
+                    onChange={(e) => {
+                      handleFieldChange("taxRateType", "custom");
+                      handleFieldChange("customTaxRate", parseFloat(e.target.value) || 0);
+                    }}
+                    placeholder="세율 직접 입력"
+                    className="w-full text-right outline-hidden text-xs sm:text-sm font-mono font-bold text-slate-900"
+                    id="input-custom-tax-rate"
+                  />
+                  <span className="text-xs sm:text-sm font-bold text-slate-500 ml-1">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* Requirement 5: 인출방식 4종 라디오 타일형 (물가상승률 및 세율 다음에 위치) */}
+        {/* ========================================================= */}
+        <div className="space-y-3 pt-2">
+          <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
+            매달 은퇴 자금 인출 방식 선택 (4종)
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* 1. 원금 포함 */}
+            <label
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "include"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="include"
+                checked={data.withdrawType === "include"}
+                onChange={() => handleFieldChange("withdrawType", "include")}
+                className="sr-only"
+              />
+              <ShieldAlert className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "include" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-xs sm:text-sm font-black block">원금 포함 수령</span>
+              <span className="text-[10px] text-slate-500 font-bold mt-1">자산을 완전히 소진</span>
+            </label>
+
+            {/* 2. 원금 유지 */}
+            <label
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "maintain"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="maintain"
+                checked={data.withdrawType === "maintain"}
+                onChange={() => handleFieldChange("withdrawType", "maintain")}
+                className="sr-only"
+              />
+              <CheckCircle2 className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "maintain" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-xs sm:text-sm font-black block">원금 유지 수령</span>
+              <span className="text-[10px] text-slate-500 font-bold mt-1">수익금(이자)만 인출</span>
+            </label>
+
+            {/* 3. 정액 수령 */}
+            <label
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "custom"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="custom"
+                checked={data.withdrawType === "custom"}
+                onChange={() => handleFieldChange("withdrawType", "custom")}
+                className="sr-only"
+              />
+              <DollarSign className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "custom" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-xs sm:text-sm font-black block">정액 생활비 수령</span>
+              <span className="text-[10px] text-slate-500 font-bold mt-1">지정한 생활비에 맞춤</span>
+            </label>
+
+            {/* 4. 최적 연금 (Requirement 3) */}
+            <label
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "optimal"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="optimal"
+                checked={data.withdrawType === "optimal"}
+                onChange={() => handleFieldChange("withdrawType", "optimal")}
+                className="sr-only"
+              />
+              <Sparkles className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "optimal" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-xs sm:text-sm font-black block">최적 연금 수령</span>
+              <span className="text-[10px] text-slate-500 font-bold mt-1">기간 지정 완소진 배분</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Sub-options for Selected Withdrawal Mode */}
+
+        {/* 1. 원금 포함 하위 서브 옵션 */}
+        {data.withdrawType === "include" && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-600 block">원금 소진 배분 조건 선택</span>
+            <div className="flex gap-6">
+              <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 cursor-pointer">
+                <input
+                  type="radio"
+                  name="includeCriteria"
+                  value="age"
+                  checked={data.includeCriteria === "age"}
+                  onChange={() => handleFieldChange("includeCriteria", "age")}
+                  className="w-4 h-4 accent-indigo-600"
+                />
+                희망 종료 나이 기준
+              </label>
+              <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 cursor-pointer">
+                <input
+                  type="radio"
+                  name="includeCriteria"
+                  value="amount"
+                  checked={data.includeCriteria === "amount"}
+                  onChange={() => handleFieldChange("includeCriteria", "amount")}
+                  className="w-4 h-4 accent-indigo-600"
+                />
+                희망 월 수급액 기준
+              </label>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-slate-200">
+              {data.includeCriteria === "age" ? (
+                <div>
+                  <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">수령 희망 종료 나이 설정</label>
+                  <select
+                    value={data.withdrawEndAge}
+                    onChange={(e) => handleFieldChange("withdrawEndAge", parseInt(e.target.value) || 90)}
+                    className="bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs w-full max-w-[240px]"
+                    id="select-withdraw-end-age"
+                  >
+                    {endAgeOptions.map((age) => (
+                      <option key={age} value={age}>
+                        만 {age}세 말 자산소진 완료
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-slate-500 font-bold mt-2.5 block leading-relaxed">
+                    ※ 지정하신 연령에 자산이 완전히 0원이 되도록 매년 균등히 실질가치 분할 인출합니다.
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">매월 자산 인출 희망액 (세전)</label>
+                  <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 max-w-[260px] shadow-2xs">
+                    <input
+                      type="text"
+                      value={data.includeMonthlyAmount === 0 ? "" : formatNumber(data.includeMonthlyAmount)}
+                      onChange={(e) => handleFormattedAmountChange("includeMonthlyAmount", e.target.value)}
+                      onFocus={() => handleFieldChange("includeMonthlyAmount", 0)}
+                      placeholder="0"
+                      className="w-full text-right outline-hidden text-sm sm:text-base font-mono font-bold text-slate-900"
+                      id="input-include-monthly-amount"
+                    />
+                    <span className="text-xs sm:text-sm font-bold text-slate-500 ml-1.5">원</span>
+                  </div>
+                  <span className="text-xs text-slate-500 font-bold mt-2 block leading-relaxed">
+                    ※ 매월 고정 인출할 금액입니다 (클릭 시 기존 금액이 지워집니다).
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 2. Requirement 4: 정액 수령 클릭시에만 보이는 '희망하는 총 은퇴 생활비 월 수급액' 칸 */}
+        {data.withdrawType === "custom" && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 animate-in fade-in slide-in-from-top-1 duration-200">
+            <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
+              희망하는 총 은퇴 생활비 월 수급액 (세전, 국민연금/사적연금 포함 총합계)
+            </label>
+            <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 max-w-[320px] shadow-2xs">
+              <input
+                type="text"
+                value={data.customMonthlyAmount === 0 ? "" : formatNumber(data.customMonthlyAmount)}
+                onChange={(e) => handleFormattedAmountChange("customMonthlyAmount", e.target.value)}
+                onFocus={() => handleFieldChange("customMonthlyAmount", 0)}
+                placeholder="0"
+                className="w-full text-right outline-hidden text-sm sm:text-base font-mono font-bold text-slate-900"
+                id="input-custom-monthly-amount"
+              />
+              <span className="text-xs sm:text-sm font-bold text-slate-500 ml-1.5">원</span>
+            </div>
+            <span className="text-xs text-slate-500 font-bold mt-2 block leading-relaxed">
+              ※ 클릭 시 기존 금액이 지워집니다. 국민연금/사적연금 수령액을 차감한 부족분만 금융자산에서 자동으로 빠져나갑니다.
+            </span>
+          </div>
+        )}
+
+        {/* 3. Requirement 3: 최적 연금 하위 서브 옵션 (시작년도/나이 ~ 마지막년도/나이) */}
+        {data.withdrawType === "optimal" && (
+          <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="space-y-1">
+              <h4 className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-indigo-600" /> 최적 연금 소진 기간 설정
+              </h4>
+              <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                시작년도부터 마지막년도까지 내가 가진 총 자산을 물가상승률과 기간 투자 수익금을 반영하여 완전 소진(0원)하도록 최적으로 설계 배분합니다.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {/* 시작 년도 / 나이 */}
+              <div>
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-700 mb-1.5">
+                  연금 시작 나이 / 년도
+                </label>
+                <select
+                  value={currentOptimalStart}
+                  onChange={(e) => {
+                    const start = parseInt(e.target.value) || currentAge;
+                    const end = Math.max(start, data.optimalEndAge || data.expectedLifespan);
+                    onChange({ ...data, optimalStartAge: start, optimalEndAge: end });
+                  }}
+                  className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs"
+                  id="select-optimal-start-age"
+                >
+                  {optimalStartAgeOptions.map((age) => (
+                    <option key={age} value={age}>
+                      만 {age}세 ({data.birthYear + age}년 시작)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 마지막 년도 / 나이 */}
+              <div>
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-700 mb-1.5">
+                  연금 마지막 나이 / 년도
+                </label>
+                <select
+                  value={data.optimalEndAge || data.expectedLifespan}
+                  onChange={(e) => handleFieldChange("optimalEndAge", parseInt(e.target.value) || data.expectedLifespan)}
+                  className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs"
+                  id="select-optimal-end-age"
+                >
+                  {optimalEndAgeOptions.map((age) => (
+                    <option key={age} value={age}>
+                      만 {age}세 ({data.birthYear + age}년 종료)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

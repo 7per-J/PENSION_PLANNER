@@ -1,0 +1,6 @@
+{
+  "name": "연금 자산 시뮬레이터",
+  "description": "은퇴 후 보유 자산과 연금수령액을 입력하여 자산 수명과 연도별 흐름을 정교하게 분석하는 은퇴 설계 시뮬레이터",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
