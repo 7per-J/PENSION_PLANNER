@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PensionIncome, FinancialAssets, SimConditions, SimYearResult, SimSummary } from "./types";
+import { BasicInfoInput } from "./components/BasicInfoInput";
 import { PensionInput } from "./components/PensionInput";
 import { AssetInput } from "./components/AssetInput";
 import { ConditionInput } from "./components/ConditionInput";
@@ -34,19 +35,19 @@ export default function App() {
 
   // 3. 시뮬레이션 기본 설정 및 조건
   const [conditions, setConditions] = useState<SimConditions>({
-    birthYear: 1970,
-    expectedLifespan: 90,
+    birthYear: 0,            // 기본 선택값 없음 (유저가 직접 선택)
+    expectedLifespan: 0,      // 기본 선택값 없음 (유저가 직접 선택)
     inflationRate: 2.0,
     withdrawType: "include", // '원금 포함' 기본값
     includeCriteria: "age",  // '종료 나이 기준' 기본값
-    withdrawEndAge: 90,
+    withdrawEndAge: 0,       // 기본 선택값 없음
     includeMonthlyAmount: 2000000,
     customMonthlyAmount: 3000000,
-    optimalStartAge: 60,
-    optimalEndAge: 85,
+    optimalStartAge: 0,      // 기본 선택값 없음
+    optimalEndAge: 0,        // 기본 선택값 없음
     taxRateType: "none",      // 비과세 기본값
     customTaxRate: 15.4,
-    withdrawalStartAge: 56,  // 2026 - 1970 = 56 (올해 나이 디폴트)
+    withdrawalStartAge: 0,   // 기본 선택값 없음 (유저가 직접 선택)
     privatePensions: [],
   });
 
@@ -101,17 +102,13 @@ export default function App() {
           <div className="flex items-center gap-2">
             <Award className="w-5.5 h-5.5 text-indigo-600" />
             <span className="font-display font-black text-lg tracking-tight text-indigo-950">
-              FutureFinance <span className="font-light text-slate-400">Labs</span>
+              연금 수령 시뮬레이터
             </span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100/50">
-            <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse" />
-            <span className="text-xs font-bold text-indigo-950">스마트 연금 자문 엔진 탑재</span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+      <main className="max-w-4xl mx-auto px-2 sm:px-4 mt-6 space-y-6">
         {/* ① Explanation Header Panel */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -131,7 +128,7 @@ export default function App() {
             연금 자산 시뮬레이터
           </h1>
           <p className="text-slate-200 text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-bold">
-            은퇴 후 보유 자산과 연금을 입력하고 아래 버튼을 클릭하면 <br className="sm:hidden" /> 몇 세까지 자산이 유지되는지와 연간 자산 변화를 정교하게 예측합니다.
+            현재 보유자산 및 보유연금을 분석하여 은퇴 후의 매달 연금 수령액을 예측합니다
           </p>
           <p className="text-xs text-slate-400 mt-5 italic border-t border-slate-800/60 pt-3 max-w-sm mx-auto font-medium">
             ※ 예상 결과이며 투자수익률과 물가에 따라 달라질 수 있습니다.
@@ -140,7 +137,10 @@ export default function App() {
 
         {/* 1-Column Sequential Flow layout */}
         <div className="space-y-6">
-          {/* ① 연금소득 입력 */}
+          {/* ① 기본 정보 */}
+          <BasicInfoInput data={conditions} onChange={setConditions} />
+
+          {/* ② 연금소득 입력 */}
           <PensionInput
             data={pensionIncome}
             birthYear={conditions.birthYear}
@@ -149,13 +149,13 @@ export default function App() {
             onPrivatePensionsChange={(pensions) => setConditions({ ...conditions, privatePensions: pensions })}
           />
 
-          {/* ② 금융자산 입력 */}
+          {/* ③ 금융자산 입력 */}
           <AssetInput
             data={financialAssets}
             onChange={setFinancialAssets}
           />
 
-          {/* ③ 시뮬레이션 설정 및 조건 */}
+          {/* ④ 시뮬레이션 조건 설정 */}
           <ConditionInput data={conditions} onChange={setConditions} />
 
           {/* Centered Large Simulation Trigger Button without white card background */}
@@ -192,7 +192,7 @@ export default function App() {
 
       {/* Footer copyright */}
       <footer className="max-w-4xl mx-auto px-4 mt-12 text-center border-t border-slate-200/60 pt-6 text-xs text-slate-500 leading-relaxed font-bold">
-        <p>© 2026 FutureFinance Labs. 본 연금 자산 시뮬레이터는 입력된 기초 매개변수에 기초한 예시 결과이며, 실제 금융 상품 성과 및 제도 변화에 따라 상이할 수 있습니다.</p>
+        <p>Copyright © 2026 7-Percents Labs. 본 연금 자산 시뮬레이터는 입력된 기초 매개변수에 기초한 예시 결과이며, 실제 금융 상품 성과 및 제도 변화에 따라 상이할 수 있습니다.</p>
         <p className="mt-1.5 font-mono text-[11px] text-slate-400 font-medium">Build Version 2.6.0 (Server-side Gemini Enabled)</p>
       </footer>
     </div>

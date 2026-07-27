@@ -74,78 +74,13 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
     <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-5">
         <Sliders className="w-6 h-6 text-indigo-600" />
-        <h3 className="text-lg font-extrabold text-indigo-950 font-display">③ 시뮬레이션 조건 설정</h3>
+        <h3 className="text-lg font-extrabold text-indigo-950 font-display">④ 시뮬레이션 조건 설정</h3>
       </div>
 
       <div className="space-y-6">
-        {/* ① 출생년도, ② 연금 개시 나이, ③ 예상 수명 설정 3개 세트 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 bg-slate-50/50 border border-slate-100 rounded-2xl p-5">
-          {/* ① 출생년도 */}
-          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
-            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
-              ① 출생년도
-            </span>
-            <select
-              value={data.birthYear}
-              onChange={(e) => handleBirthYearChange(parseInt(e.target.value) || 1970)}
-              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
-              id="select-birth-year"
-            >
-              {birthYearOptions.map((year) => (
-                <option key={year} value={year}>
-                  {year}년생 (만 {2026 - year}세)
-                </option>
-              ))}
-            </select>
-            <span className="text-[11px] text-indigo-600 font-extrabold mt-3 text-center block">
-              만 나이 기준시점: 2026년 말
-            </span>
-          </div>
-
-          {/* ② 연금 개시 나이 */}
-          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
-            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
-              ② 연금 개시 나이
-            </span>
-            <select
-              value={startAgeOptions.includes(data.withdrawalStartAge) ? data.withdrawalStartAge : currentAge}
-              onChange={(e) => handleFieldChange("withdrawalStartAge", parseInt(e.target.value) || currentAge)}
-              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
-              id="select-withdrawal-start-age"
-            >
-              {startAgeOptions.map((age) => (
-                <option key={age} value={age}>
-                  만 {age}세 {age === currentAge ? "(올해 개시)" : ""}
-                </option>
-              ))}
-            </select>
-            <span className="text-[11px] text-slate-500 font-bold mt-3 text-center block leading-relaxed">
-              은퇴자산 인출 시작 시점 (최대 80세)
-            </span>
-          </div>
-
-          {/* ③ 예상 수명 설정 */}
-          <div className="flex flex-col items-stretch p-4 bg-white rounded-xl border border-slate-100 shadow-2xs">
-            <span className="block text-xs sm:text-sm font-black text-slate-700 mb-2.5 text-center">
-              ③ 예상 수명 설정
-            </span>
-            <select
-              value={data.expectedLifespan}
-              onChange={(e) => handleFieldChange("expectedLifespan", parseInt(e.target.value) || 90)}
-              className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs text-center"
-              id="select-expected-lifespan"
-            >
-              {lifespanOptions.map((age) => (
-                <option key={age} value={age}>
-                  만 {age}세까지 은퇴 분석
-                </option>
-              ))}
-            </select>
-            <span className="text-[11px] text-slate-400 font-semibold text-center mt-3 block leading-relaxed">
-              최종 시뮬레이션 종료 지점
-            </span>
-          </div>
-        </div>
+        {/* ========================================================= */}
+        {/* 물가상승률 및 세율 방식 */}
+        {/* ========================================================= */}
 
         {/* ========================================================= */}
         {/* Requirement 5: 물가인상율 및 세율 방식 (예상수명 설정 바로 다음에 위치) */}
@@ -247,10 +182,10 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
           <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
             매달 은퇴 자금 인출 방식 선택 (4종)
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
             {/* 1. 원금 포함 */}
             <label
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
                 data.withdrawType === "include"
                   ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -264,14 +199,14 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                 onChange={() => handleFieldChange("withdrawType", "include")}
                 className="sr-only"
               />
-              <ShieldAlert className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "include" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-xs sm:text-sm font-black block">원금 포함 수령</span>
-              <span className="text-[10px] text-slate-500 font-bold mt-1">자산을 완전히 소진</span>
+              <ShieldAlert className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "include" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 포함 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">자산을 완전히 소진</span>
             </label>
 
             {/* 2. 원금 유지 */}
             <label
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
                 data.withdrawType === "maintain"
                   ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -285,14 +220,14 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                 onChange={() => handleFieldChange("withdrawType", "maintain")}
                 className="sr-only"
               />
-              <CheckCircle2 className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "maintain" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-xs sm:text-sm font-black block">원금 유지 수령</span>
-              <span className="text-[10px] text-slate-500 font-bold mt-1">수익금(이자)만 인출</span>
+              <CheckCircle2 className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "maintain" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 유지 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">수익금(이자)만 인출</span>
             </label>
 
             {/* 3. 정액 수령 */}
             <label
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
                 data.withdrawType === "custom"
                   ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -306,14 +241,14 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                 onChange={() => handleFieldChange("withdrawType", "custom")}
                 className="sr-only"
               />
-              <DollarSign className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "custom" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-xs sm:text-sm font-black block">정액 생활비 수령</span>
-              <span className="text-[10px] text-slate-500 font-bold mt-1">지정한 생활비에 맞춤</span>
+              <DollarSign className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "custom" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">정액 생활비 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">지정한 생활비에 맞춤</span>
             </label>
 
             {/* 4. 최적 연금 (Requirement 3) */}
             <label
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all ${
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
                 data.withdrawType === "optimal"
                   ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -327,9 +262,9 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                 onChange={() => handleFieldChange("withdrawType", "optimal")}
                 className="sr-only"
               />
-              <Sparkles className={`w-5.5 h-5.5 mb-1.5 ${data.withdrawType === "optimal" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-xs sm:text-sm font-black block">최적 연금 수령</span>
-              <span className="text-[10px] text-slate-500 font-bold mt-1">기간 지정 완소진 배분</span>
+              <Sparkles className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "optimal" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">최적 연금 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">기간 지정 완소진 배분</span>
             </label>
           </div>
         </div>
@@ -370,11 +305,12 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                 <div>
                   <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">수령 희망 종료 나이 설정</label>
                   <select
-                    value={data.withdrawEndAge}
-                    onChange={(e) => handleFieldChange("withdrawEndAge", parseInt(e.target.value) || 90)}
+                    value={data.withdrawEndAge || ""}
+                    onChange={(e) => handleFieldChange("withdrawEndAge", parseInt(e.target.value) || 0)}
                     className="bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs w-full max-w-[240px]"
                     id="select-withdraw-end-age"
                   >
+                    <option value="">선택하세요</option>
                     {endAgeOptions.map((age) => (
                       <option key={age} value={age}>
                         만 {age}세 말 자산소진 완료
@@ -452,18 +388,19 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                   연금 시작 나이 / 년도
                 </label>
                 <select
-                  value={currentOptimalStart}
+                  value={data.optimalStartAge || ""}
                   onChange={(e) => {
-                    const start = parseInt(e.target.value) || currentAge;
-                    const end = Math.max(start, data.optimalEndAge || data.expectedLifespan);
+                    const start = parseInt(e.target.value) || 0;
+                    const end = Math.max(start, data.optimalEndAge || data.expectedLifespan || 90);
                     onChange({ ...data, optimalStartAge: start, optimalEndAge: end });
                   }}
                   className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs"
                   id="select-optimal-start-age"
                 >
+                  <option value="">선택하세요</option>
                   {optimalStartAgeOptions.map((age) => (
                     <option key={age} value={age}>
-                      만 {age}세 ({data.birthYear + age}년 시작)
+                      만 {age}세 {data.birthYear > 0 ? `(${data.birthYear + age}년 시작)` : "시작"}
                     </option>
                   ))}
                 </select>
@@ -475,14 +412,15 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
                   연금 마지막 나이 / 년도
                 </label>
                 <select
-                  value={data.optimalEndAge || data.expectedLifespan}
-                  onChange={(e) => handleFieldChange("optimalEndAge", parseInt(e.target.value) || data.expectedLifespan)}
+                  value={data.optimalEndAge || ""}
+                  onChange={(e) => handleFieldChange("optimalEndAge", parseInt(e.target.value) || 0)}
                   className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs"
                   id="select-optimal-end-age"
                 >
+                  <option value="">선택하세요</option>
                   {optimalEndAgeOptions.map((age) => (
                     <option key={age} value={age}>
-                      만 {age}세 ({data.birthYear + age}년 종료)
+                      만 {age}세 {data.birthYear > 0 ? `(${data.birthYear + age}년 종료)` : "종료"}
                     </option>
                   ))}
                 </select>

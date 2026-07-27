@@ -61,7 +61,7 @@ export const PensionInput: React.FC<PensionInputProps> = ({
     <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-5">
         <Wallet className="w-6 h-6 text-indigo-600" />
-        <h3 className="text-lg font-extrabold text-indigo-950 font-display">① 연금소득 입력</h3>
+        <h3 className="text-lg font-extrabold text-indigo-950 font-display">② 연금소득 입력</h3>
       </div>
 
       <div className="space-y-6">

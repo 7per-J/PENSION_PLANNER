@@ -82,7 +82,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({
     <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-5">
         <Landmark className="w-6 h-6 text-indigo-600" />
-        <h3 className="text-lg font-extrabold text-indigo-950 font-display">② 금융자산 입력</h3>
+        <h3 className="text-lg font-extrabold text-indigo-950 font-display">③ 금융자산 입력</h3>
       </div>
 
       <div className="space-y-6">
