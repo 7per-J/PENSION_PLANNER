@@ -258,26 +258,15 @@ export function runPensionSimulation(
       }
     } 
     else if (conditions.withdrawType === 'custom') {
-      // [정액 수령 / 맞춤 수령]: 기대수명(maxSimAge)까지 전체 수령액 평탄화 인출
+      // [정액 생활비 수령]: 입력한 customMonthlyAmount가 수급 최초년도의 희망 월 총수령액 목표.
+      // 매년 물가상승률(inflationRate)만큼 복리로 증가시키며, 고정연금(국민+사적)을 뺀 차액을 자산에서 인출.
       const startAge = conditions.withdrawalStartAge > 0 ? conditions.withdrawalStartAge : currentAge;
       const endAge = maxSimAge;
       if (age >= startAge && age <= endAge) {
-        if (baseIncludeTotalT0 === null && afterYieldAssetsSum >= 0) {
-          const weightedYield = afterYieldAssetsSum > 0 ? assets.reduce((sum, a) => sum + ((a.principal + a.yieldAccum) * a.yieldRate), 0) / afterYieldAssetsSum : 0;
-          baseIncludeTotalT0 = computeSmoothedTotalTargetIncome(
-            startAge,
-            endAge,
-            afterYieldAssetsSum,
-            weightedYield,
-            conditions.inflationRate,
-            finalNationalStartAge,
-            initialNationalAmount,
-            conditions.privatePensions
-          );
-        }
         const yearsInWithdrawal = age - startAge;
-        const currentTargetTotalAnnual = (baseIncludeTotalT0 || 0) * Math.pow(1 + (conditions.inflationRate / 100), yearsInWithdrawal);
-        const requiredAssetWithdrawal = Math.max(0, currentTargetTotalAnnual - annualTotalFixedPensions);
+        const adjustedTargetMonthly = conditions.customMonthlyAmount * Math.pow(1 + (conditions.inflationRate / 100), yearsInWithdrawal);
+        const targetAnnualTotal = adjustedTargetMonthly * 12;
+        const requiredAssetWithdrawal = Math.max(0, targetAnnualTotal - annualTotalFixedPensions);
         targetAnnualWithdraw = Math.min(afterYieldAssetsSum, requiredAssetWithdrawal);
       } else {
         targetAnnualWithdraw = 0;
