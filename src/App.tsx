@@ -6,8 +6,8 @@ import { AssetInput } from "./components/AssetInput";
 import { ConditionInput } from "./components/ConditionInput";
 import { ResultReport } from "./components/ResultReport";
 import { runPensionSimulation } from "./utils/simulation";
-import { Award, Sparkles, RefreshCw } from "lucide-react";
-import { motion } from "motion/react";
+import { Award, RefreshCw, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   // 1. 연금 소득 상태
@@ -38,23 +38,36 @@ export default function App() {
     birthYear: 0,            // 기본 선택값 없음 (유저가 직접 선택)
     expectedLifespan: 0,      // 기본 선택값 없음 (유저가 직접 선택)
     inflationRate: 2.0,
-    withdrawType: "include", // '원금 포함' 기본값
-    includeCriteria: "age",  // '종료 나이 기준' 기본값
-    withdrawEndAge: 0,       // 기본 선택값 없음
+    withdrawType: "optimal",  // '최적 연금' 기본값
+    includeCriteria: "age",   // '종료 나이 기준' 기본값
+    withdrawEndAge: 0,        // 기본 선택값 없음
     includeMonthlyAmount: 2000000,
     customMonthlyAmount: 3000000,
-    optimalStartAge: 0,      // 기본 선택값 없음
-    optimalEndAge: 0,        // 기본 선택값 없음
-    taxRateType: "none",      // 비과세 기본값
+    optimalStartAge: 0,       // 기본 선택값 없음
+    optimalEndAge: 0,         // 기본 선택값 없음
+    taxRateType: "pension",   // 연금소득세(5.5%) 기본값
     customTaxRate: 15.4,
-    withdrawalStartAge: 0,   // 기본 선택값 없음 (유저가 직접 선택)
+    withdrawalStartAge: 0,    // 기본 선택값 없음 (유저가 직접 선택)
     privatePensions: [],
   });
 
   // 4. 시뮬레이션 실행 버튼 클릭 여부 (Requirement 1: 최초 클릭 전까지 차트/도표 비노출)
   const [hasSimulated, setHasSimulated] = useState<boolean>(false);
 
-  // 5. 시뮬레이션 결과 데이터 상태
+  // 5. Toast Popup Message State
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Auto hide toast message after 3.5 seconds
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  // 6. 시뮬레이션 결과 데이터 상태
   const [simResults, setSimResults] = useState<SimYearResult[]>([]);
   const [simSummary, setSimSummary] = useState<SimSummary>({
     totalAssets: 0,
@@ -76,6 +89,12 @@ export default function App() {
 
   // Manual Trigger to re-simulate or scroll to results
   const handleRunSimulation = () => {
+    // Check if basic information (birthYear, withdrawalStartAge, expectedLifespan) is entered
+    if (!conditions.birthYear || !conditions.withdrawalStartAge || !conditions.expectedLifespan) {
+      setToastMessage("기본 정보와 자산을 입력해야 시뮬레이션하실 수 있습니다");
+      return;
+    }
+
     setHasSimulated(true);
     const { results, summary } = runPensionSimulation(
       pensionIncome,
@@ -188,6 +207,21 @@ export default function App() {
             />
           </motion.div>
         )}
+        {/* Toast Popup Message */}
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-slate-950/90 text-white text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-3 backdrop-blur-md"
+            >
+              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+              <span>{toastMessage}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Footer copyright */}
