@@ -183,70 +183,7 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
             매달 은퇴 자금 인출 방식 선택 (4종)
           </label>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-            {/* 1. 원금 포함 */}
-            <label
-              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
-                data.withdrawType === "include"
-                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
-                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="withdrawType"
-                value="include"
-                checked={data.withdrawType === "include"}
-                onChange={() => handleFieldChange("withdrawType", "include")}
-                className="sr-only"
-              />
-              <ShieldAlert className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "include" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 포함 수령</span>
-              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">자산을 완전히 소진</span>
-            </label>
-
-            {/* 2. 원금 유지 */}
-            <label
-              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
-                data.withdrawType === "maintain"
-                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
-                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="withdrawType"
-                value="maintain"
-                checked={data.withdrawType === "maintain"}
-                onChange={() => handleFieldChange("withdrawType", "maintain")}
-                className="sr-only"
-              />
-              <CheckCircle2 className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "maintain" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 유지 수령</span>
-              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">수익금(이자)만 인출</span>
-            </label>
-
-            {/* 3. 정액 수령 */}
-            <label
-              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
-                data.withdrawType === "custom"
-                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
-                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="withdrawType"
-                value="custom"
-                checked={data.withdrawType === "custom"}
-                onChange={() => handleFieldChange("withdrawType", "custom")}
-                className="sr-only"
-              />
-              <DollarSign className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "custom" ? "text-indigo-600" : "text-slate-400"}`} />
-              <span className="text-[11px] sm:text-sm font-black block leading-tight">정액 생활비 수령</span>
-              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">지정한 생활비에 맞춤</span>
-            </label>
-
-            {/* 4. 최적 연금 (Requirement 3) */}
+            {/* 1. 최적 연금 */}
             <label
               className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
                 data.withdrawType === "optimal"
@@ -266,6 +203,69 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
               <span className="text-[11px] sm:text-sm font-black block leading-tight">최적 연금 수령</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">기간 지정 완소진 배분</span>
             </label>
+
+            {/* 2. 원금 포함 */}
+            <label
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "include"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="include"
+                checked={data.withdrawType === "include"}
+                onChange={() => handleFieldChange("withdrawType", "include")}
+                className="sr-only"
+              />
+              <CheckCircle2 className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "include" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 포함 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">자산을 완전히 소진</span>
+            </label>
+
+            {/* 3. 원금 유지 */}
+            <label
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "maintain"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="maintain"
+                checked={data.withdrawType === "maintain"}
+                onChange={() => handleFieldChange("withdrawType", "maintain")}
+                className="sr-only"
+              />
+              <ShieldAlert className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "maintain" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">원금 유지 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">수익금(이자)만 인출</span>
+            </label>
+
+            {/* 4. 시작 금액 지정 수령 */}
+            <label
+              className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-xl border text-center cursor-pointer transition-all ${
+                data.withdrawType === "custom"
+                  ? "bg-indigo-50/60 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="withdrawType"
+                value="custom"
+                checked={data.withdrawType === "custom"}
+                onChange={() => handleFieldChange("withdrawType", "custom")}
+                className="sr-only"
+              />
+              <DollarSign className={`w-5 h-5 sm:w-5.5 sm:h-5.5 mb-1 ${data.withdrawType === "custom" ? "text-indigo-600" : "text-slate-400"}`} />
+              <span className="text-[11px] sm:text-sm font-black block leading-tight">시작 금액 지정 수령</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">지정한 생활비에 맞춤</span>
+            </label>
           </div>
         </div>
 
@@ -273,83 +273,34 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
 
         {/* 1. 원금 포함 하위 서브 옵션 */}
         {data.withdrawType === "include" && (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-            <span className="text-xs sm:text-sm font-extrabold text-slate-600 block">원금 소진 배분 조건 선택</span>
-            <div className="flex gap-6">
-              <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 cursor-pointer">
-                <input
-                  type="radio"
-                  name="includeCriteria"
-                  value="age"
-                  checked={data.includeCriteria === "age"}
-                  onChange={() => handleFieldChange("includeCriteria", "age")}
-                  className="w-4 h-4 accent-indigo-600"
-                />
-                희망 종료 나이 기준
-              </label>
-              <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 cursor-pointer">
-                <input
-                  type="radio"
-                  name="includeCriteria"
-                  value="amount"
-                  checked={data.includeCriteria === "amount"}
-                  onChange={() => handleFieldChange("includeCriteria", "amount")}
-                  className="w-4 h-4 accent-indigo-600"
-                />
-                희망 월 수급액 기준
-              </label>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-slate-200">
-              {data.includeCriteria === "age" ? (
-                <div>
-                  <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">수령 희망 종료 나이 설정</label>
-                  <select
-                    value={data.withdrawEndAge || ""}
-                    onChange={(e) => handleFieldChange("withdrawEndAge", parseInt(e.target.value) || 0)}
-                    className="bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs w-full max-w-[240px]"
-                    id="select-withdraw-end-age"
-                  >
-                    <option value="">선택하세요</option>
-                    {endAgeOptions.map((age) => (
-                      <option key={age} value={age}>
-                        만 {age}세 말 자산소진 완료
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-xs text-slate-500 font-bold mt-2.5 block leading-relaxed">
-                    ※ 지정하신 연령에 자산이 완전히 0원이 되도록 매년 균등히 실질가치 분할 인출합니다.
-                  </span>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">매월 자산 인출 희망액 (세전)</label>
-                  <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 max-w-[260px] shadow-2xs">
-                    <input
-                      type="text"
-                      value={data.includeMonthlyAmount === 0 ? "" : formatNumber(data.includeMonthlyAmount)}
-                      onChange={(e) => handleFormattedAmountChange("includeMonthlyAmount", e.target.value)}
-                      onFocus={() => handleFieldChange("includeMonthlyAmount", 0)}
-                      placeholder="0"
-                      className="w-full text-right outline-hidden text-sm sm:text-base font-mono font-bold text-slate-900"
-                      id="input-include-monthly-amount"
-                    />
-                    <span className="text-xs sm:text-sm font-bold text-slate-500 ml-1.5">원</span>
-                  </div>
-                  <span className="text-xs text-slate-500 font-bold mt-2 block leading-relaxed">
-                    ※ 매월 고정 인출할 금액입니다 (클릭 시 기존 금액이 지워집니다).
-                  </span>
-                </div>
-              )}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div>
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">수령 희망 종료 나이 설정</label>
+              <select
+                value={data.withdrawEndAge || data.expectedLifespan || ""}
+                onChange={(e) => handleFieldChange("withdrawEndAge", parseInt(e.target.value) || 0)}
+                className="bg-white border border-slate-200 rounded-lg p-2.5 text-xs sm:text-sm text-slate-800 font-bold outline-hidden cursor-pointer shadow-2xs w-full max-w-[280px]"
+                id="select-withdraw-end-age"
+              >
+                <option value="">선택하세요</option>
+                {endAgeOptions.map((age) => (
+                  <option key={age} value={age}>
+                    만 {age}세 말 자산소진 완료
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-slate-500 font-bold mt-2.5 block leading-relaxed">
+                ※ 기본 정보의 예상 수명{data.expectedLifespan > 0 ? `(만 ${data.expectedLifespan}세)` : ""}이 기본 적용되며, 원하시는 나이로 직접 변경이 가능합니다.
+              </span>
             </div>
           </div>
         )}
 
-        {/* 2. Requirement 4: 정액 수령 클릭시에만 보이는 '희망하는 총 은퇴 생활비 월 수급액' 칸 */}
+        {/* 2. 시작 금액 지정 수령 하위 서브 옵션 */}
         {data.withdrawType === "custom" && (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 animate-in fade-in slide-in-from-top-1 duration-200">
             <label className="block text-xs sm:text-sm font-extrabold text-slate-600 mb-1.5">
-              희망하는 총 은퇴 생활비 월 수급액 (세전, 국민연금/사적연금 포함 총합계)
+              수급 최초년도 희망 월 총수령액 (세전, 국민연금/사적연금 포함 총합계)
             </label>
             <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 max-w-[320px] shadow-2xs">
               <input
@@ -364,7 +315,7 @@ export const ConditionInput: React.FC<ConditionInputProps> = ({ data, onChange }
               <span className="text-xs sm:text-sm font-bold text-slate-500 ml-1.5">원</span>
             </div>
             <span className="text-xs text-slate-500 font-bold mt-2 block leading-relaxed">
-              ※ 클릭 시 기존 금액이 지워집니다. 국민연금/사적연금 수령액을 차감한 부족분만 금융자산에서 자동으로 빠져나갑니다.
+              ※ 클릭 시 기존 금액이 지워집니다. 수급 시작년도 기준 금액이며, 매년 물가상승률만큼 증액되고 고정연금을 차감한 부족분만 자산에서 인출됩니다.
             </span>
           </div>
         )}
